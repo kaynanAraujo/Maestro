@@ -13,6 +13,10 @@ Aplicativo de desktop para Windows que gerencia skills do Claude Code. Permite e
 
 ## Instalação e desenvolvimento
 
+Para usar o aplicativo sem preparar o ambiente de desenvolvimento, baixe `Maestro-Setup-1.6.3.exe` na [página de Releases](https://github.com/kaynanAraujo/Maestro/releases) e execute o instalador no Windows. O instalador desta versão não tem assinatura digital; o Windows pode mostrar um aviso sobre o editor desconhecido. Confira se o download veio da página oficial do projeto.
+
+Para instalar uma versão posterior, baixe o novo instalador na mesma página e execute-o por cima da instalação atual. Seus dados ficam em `%APPDATA%\Maestro`.
+
 No PowerShell, a partir da pasta do projeto:
 
 ```powershell

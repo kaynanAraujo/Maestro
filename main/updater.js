@@ -6,10 +6,11 @@ const path = require('node:path');
 class UpdateManager {
   constructor(send) {
     this.send = send;
+    this.hasFeed = !app.isPackaged || Boolean(process.resourcesPath && fs.existsSync(path.join(process.resourcesPath, 'app-update.yml')));
     this.stateFile = path.join(app.getPath('userData'), 'atualizacoes.json');
     let checkedAt = null;
     try { checkedAt = JSON.parse(fs.readFileSync(this.stateFile, 'utf8')).checkedAt || null; } catch {}
-    this.state = { phase: 'idle', version: app.getVersion(), checkedAt, availableVersion: null, notes: '', percent: 0, error: null };
+    this.state = { phase: this.hasFeed ? 'idle' : 'manual', version: app.getVersion(), checkedAt, availableVersion: null, notes: '', percent: 0, error: null };
     autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = false;
     autoUpdater.on('checking-for-update', () => this.set({ phase: 'checking', error: null }));
@@ -27,6 +28,7 @@ class UpdateManager {
   snapshot() { return this.state; }
   async check() {
     if (!app.isPackaged || process.platform !== 'win32') throw Error('A verificação de atualizações requer o aplicativo instalado no Windows.');
+    if (!this.hasFeed) throw Error('Este instalador usa atualizações manuais. Baixe a próxima versão na página Releases do GitHub.');
     if (this.state.phase === 'checking' || this.state.phase === 'downloading') return this.state;
     const checkedAt = new Date().toISOString();
     fs.writeFileSync(this.stateFile, JSON.stringify({ checkedAt }));

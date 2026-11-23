@@ -4,7 +4,7 @@ Aplicativo de janela própria para gerenciar suas skills do Claude Code. Não us
 
 ## Instalar o programa
 
-Abra o instalador versionado em `dist` (`Maestro-Setup-VERSÃO.exe`), siga o assistente e escolha a pasta de instalação. O instalador cria atalhos na área de trabalho e no menu Iniciar. Para remover, use **Aplicativos instalados** do Windows. Seus dados permanecem em `%APPDATA%\Maestro`.
+Baixe o instalador versionado (`Maestro-Setup-VERSÃO.exe`) na [página de Releases](https://github.com/kaynanAraujo/Maestro/releases), siga o assistente e escolha a pasta de instalação. O instalador cria atalhos na área de trabalho e no menu Iniciar. Para remover, use **Aplicativos instalados** do Windows. Seus dados permanecem em `%APPDATA%\Maestro`.
 
 Na primeira abertura, o catálogo atual é copiado para a pasta de dados. O programa gerencia `%USERPROFILE%\.claude\skills` por padrão; outra pasta pode ser escolhida em **Configurações**.
 

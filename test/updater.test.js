@@ -8,6 +8,7 @@ const { EventEmitter } = require('node:events');
 
 test('atualização exige cliques para download e instalação', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maestro-update-'));
+  fs.writeFileSync(path.join(dir, 'app-update.yml'), 'provider: github');
   const updater = new EventEmitter();
   let checks = 0, downloads = 0, installs = 0;
   updater.checkForUpdates = async () => { checks++; updater.emit('update-available', { version: '2.0.0', releaseNotes: 'Novidades' }); };
@@ -16,7 +17,7 @@ test('atualização exige cliques para download e instalação', async () => {
   const source = fs.readFileSync(path.join(__dirname, '..', 'main', 'updater.js'), 'utf8');
   const module = { exports: {} };
   const app = { isPackaged: true, getVersion: () => '1.6.0', getPath: () => dir };
-  vm.runInNewContext(source, { module, require: name => name === 'electron' ? { app } : name === 'electron-updater' ? { autoUpdater: updater } : require(name), process: { platform: 'win32' }, Date, Error, String, Math, JSON });
+  vm.runInNewContext(source, { module, require: name => name === 'electron' ? { app } : name === 'electron-updater' ? { autoUpdater: updater } : require(name), process: { platform: 'win32', resourcesPath: dir }, Date, Error, String, Math, JSON });
   const manager = new module.exports.UpdateManager(() => {});
   assert.equal(updater.autoDownload, false);
   assert.equal(updater.autoInstallOnAppQuit, false);
@@ -30,5 +31,16 @@ test('atualização exige cliques para download e instalação', async () => {
   assert.equal(installs, 0);
   manager.install();
   assert.equal(installs, 1);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+test('instalador sem feed informa atualização manual', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maestro-update-manual-'));
+  const source = fs.readFileSync(path.join(__dirname, '..', 'main', 'updater.js'), 'utf8');
+  const module = { exports: {} };
+  const app = { isPackaged: true, getVersion: () => '1.6.3', getPath: () => dir };
+  vm.runInNewContext(source, { module, require: name => name === 'electron' ? { app } : name === 'electron-updater' ? { autoUpdater: new EventEmitter() } : require(name), process: { platform: 'win32', resourcesPath: dir }, Date, Error, String, Math, JSON });
+  const manager = new module.exports.UpdateManager(() => {});
+  assert.equal(manager.snapshot().phase, 'manual');
+  await assert.rejects(manager.check(), /atualizações manuais/);
   fs.rmSync(dir, { recursive: true, force: true });
 });

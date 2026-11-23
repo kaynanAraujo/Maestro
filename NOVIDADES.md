@@ -1,5 +1,11 @@
 # Novidades do Maestro
 
+## 1.6.3 — 23/11/2026
+
+- Primeiro instalador preparado para distribuição pública pelo GitHub Releases.
+- Instaladores sem configuração de atualização automática agora mostram instruções para atualizar manualmente, em vez de um erro de arquivo ausente.
+- A verificação de atualizações de Skills distingue instalações antigas sem versão de referência de arquivos modificados localmente.
+
 ## 1.6.2 — 22/11/2026
 
 - O botão Atualizar de uma Skill aparece somente quando há uma atualização confirmada.

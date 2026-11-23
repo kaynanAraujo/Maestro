@@ -31,7 +31,7 @@ else {
     win.maximize();
     win.setMenuBarVisibility(false);
     win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
-    win.webContents.once('did-finish-load', () => { if (app.isPackaged && process.platform === 'win32') updates.check().catch(() => {}); });
+    win.webContents.once('did-finish-load', () => { if (app.isPackaged && process.platform === 'win32' && updates.hasFeed) updates.check().catch(() => {}); });
     win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     win.webContents.on('will-navigate', e => e.preventDefault());
     monitor = new SkillMonitor(store, sendChange); monitor.start();

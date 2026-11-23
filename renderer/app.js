@@ -157,13 +157,13 @@ let lastUpdatePhase;
 function renderUpdate(state) {
   $('updateVersion').textContent = state.version;
   $('updateChecked').textContent = state.checkedAt ? new Date(state.checkedAt).toLocaleString('pt-BR') : 'Ainda não verificado';
-  const status = { idle: 'Pronto para verificar.', checking: 'Verificando atualizações…', current: 'O MAESTRO está atualizado.', available: `Versão ${state.availableVersion} disponível.`, downloading: `Baixando versão ${state.availableVersion}: ${state.percent}%`, ready: `Versão ${state.availableVersion} pronta para instalar.`, error: `Falha na verificação: ${state.error}` };
+  const status = { idle: 'Pronto para verificar.', manual: 'Atualizações do aplicativo: baixe o próximo instalador em github.com/kaynanAraujo/Maestro/releases.', checking: 'Verificando atualizações…', current: 'O MAESTRO está atualizado.', available: `Versão ${state.availableVersion} disponível.`, downloading: `Baixando versão ${state.availableVersion}: ${state.percent}%`, ready: `Versão ${state.availableVersion} pronta para instalar.`, error: `Falha na verificação: ${state.error}` };
   $('updateStatus').textContent = status[state.phase] || '';
   $('updateNotes').textContent = state.notes || '';
   $('updateNotes').classList.toggle('hidden', !state.notes || !['available', 'downloading', 'ready'].includes(state.phase));
   $('updateProgress').classList.toggle('hidden', state.phase !== 'downloading');
   $('updateProgress').value = state.percent;
-  $('updateCheck').disabled = ['checking', 'downloading'].includes(state.phase);
+  $('updateCheck').disabled = ['checking', 'downloading', 'manual'].includes(state.phase);
   $('updateDownload').classList.toggle('hidden', state.phase !== 'available');
   $('updateInstall').classList.toggle('hidden', state.phase !== 'ready');
   if (state.phase === 'available' && lastUpdatePhase !== 'available') showToast(`MAESTRO ${state.availableVersion} disponível. ${state.notes || ''}`.slice(0, 300));
