@@ -1,0 +1,42 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { Store } = require('../main/store');
+const seed = path.join(__dirname, '..', 'dados', 'catalogo.json');
+function setup(t) { const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'maestro-')); t.after(() => fs.rmSync(tmp, { recursive: true, force: true })); const root = path.join(tmp, 'skills'); fs.mkdirSync(root); const store = new Store(path.join(tmp, 'data'), seed); store.setPath(root); return { tmp, root, store }; }
+test('modos, desfazer, perfis, importação, remoção e restauração', t => {
+  const { tmp, root, store } = setup(t);
+  store.add('teste', 'Descrição de teste', 'Corpo da skill');
+  const file = path.join(root, 'teste', 'SKILL.md');
+  const original = fs.readFileSync(file, 'utf8');
+  assert.equal(store.scan().find(s => s.name === 'teste').mode, 'Automática');
+  store.saveProfile('Padrão');
+  const first = store.mode('teste', 'Só manual');
+  assert.match(fs.readFileSync(file, 'utf8'), /disable-model-invocation: true/);
+  store.restore(first.backupId);
+  assert.equal(fs.readFileSync(file, 'utf8'), original);
+  store.mode('teste', 'Desligada');
+  assert.ok(fs.existsSync(file + '.disabled'));
+  assert.deepEqual(store.previewProfile('Padrão').map(c => c.name), ['teste']);
+  store.applyProfile('Padrão');
+  assert.ok(fs.existsSync(file));
+  const importSource = path.join(tmp, 'origem'); fs.mkdirSync(importSource); fs.writeFileSync(path.join(importSource, 'SKILL.md'), original);
+  store.import('importada', importSource);
+  assert.ok(store.scan().some(s => s.name === 'importada'));
+  store.remove('importada');
+  assert.ok(!fs.existsSync(path.join(root, 'importada')));
+  const entry = store.history().find(h => h.skill === 'importada' && h.action === 'Skill removida');
+  store.restore(entry.backupId);
+  assert.ok(fs.existsSync(path.join(root, 'importada', 'SKILL.md')));
+  store.deleteProfile('Padrão');
+});
+test('watcher detecta skill instalada por fora', async t => {
+  const { root, store } = setup(t); let notify;
+  const seen = new Promise((resolve, reject) => { const timeout = setTimeout(() => reject(Error('Watcher não disparou')), 3000); notify = () => { clearTimeout(timeout); resolve(); }; });
+  store.watch(notify); t.after(() => store.watcher?.close());
+  const folder = path.join(root, 'externa'); fs.mkdirSync(folder); fs.writeFileSync(path.join(folder, 'SKILL.md'), '---\nname: externa\ndescription: Externa\n---\n');
+  await seen; assert.ok(store.scan().some(s => s.name === 'externa'));
+});
+test('bloqueia nomes com travessia de caminho', t => { const { store } = setup(t); assert.throws(() => store.folder('../fora')); });

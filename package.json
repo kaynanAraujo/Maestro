@@ -1,0 +1,63 @@
+{
+  "name": "maestro-skills",
+  "version": "1.6.2",
+  "private": true,
+  "description": "Gerenciador de skills do Claude Code",
+  "main": "main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "lint": "node scripts/lint.js",
+    "test": "node --test",
+    "icon": "node scripts/generate-icon.js",
+    "dist": "node scripts/prepare-build.js && npm run icon && electron-builder --win nsis",
+    "release": "node scripts/publish-release.js"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "br.com.maestro.skills",
+    "productName": "Maestro",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main/**/*",
+      "preload/**/*",
+      "renderer/**/*",
+      "dados/**/*",
+      "assets/**/*",
+      "NOVIDADES.md",
+      "package.json",
+      "node_modules/yaml/**/*"
+    ],
+    "extraMetadata": {
+      "main": "main/index.js"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/maestro.ico"
+    },
+    "nsis": {
+      "artifactName": "Maestro-Setup-${version}.exe",
+      "installerIcon": "assets/maestro.ico",
+      "uninstallerIcon": "assets/maestro.ico",
+      "installerHeaderIcon": "assets/maestro.ico",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "allowScripts": {
+    "electron@39.8.10": true
+  }
+}

@@ -1,0 +1,18 @@
+{
+    "frontend-design":  {
+                            "paraQueServe":  "Orienta a criação de interfaces visuais distintas, com escolhas intencionais de tipografia, cores e composição.",
+                            "quandoUsar":  "Ao criar uma interface nova ou redesenhar uma existente."
+                        },
+    "vercel-react-native-skills":  {
+                                       "paraQueServe":  "Reúne boas práticas de React Native e Expo para desempenho, listas, animações e recursos nativos.",
+                                       "quandoUsar":  "Ao desenvolver ou otimizar aplicativos móveis com React Native ou Expo."
+                                   },
+    "web-design-guidelines":  {
+                                  "paraQueServe":  "Revisa código de interface segundo diretrizes de design, acessibilidade e experiência de uso.",
+                                  "quandoUsar":  "Ao pedir uma revisão de UI, acessibilidade, UX ou boas práticas de um site."
+                              },
+    "supabase":  {
+                     "paraQueServe":  "Ajuda em tarefas com Supabase, incluindo banco de dados, autenticação, armazenamento, funções e solução de erros.",
+                     "quandoUsar":  "Quando o projeto usar qualquer recurso do Supabase."
+                 }
+}

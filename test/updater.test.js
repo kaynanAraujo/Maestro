@@ -1,0 +1,34 @@
+﻿const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const vm = require('node:vm');
+const { EventEmitter } = require('node:events');
+
+test('atualização exige cliques para download e instalação', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'maestro-update-'));
+  const updater = new EventEmitter();
+  let checks = 0, downloads = 0, installs = 0;
+  updater.checkForUpdates = async () => { checks++; updater.emit('update-available', { version: '2.0.0', releaseNotes: 'Novidades' }); };
+  updater.downloadUpdate = async () => { downloads++; updater.emit('update-downloaded', { version: '2.0.0' }); };
+  updater.quitAndInstall = () => { installs++; };
+  const source = fs.readFileSync(path.join(__dirname, '..', 'main', 'updater.js'), 'utf8');
+  const module = { exports: {} };
+  const app = { isPackaged: true, getVersion: () => '1.6.0', getPath: () => dir };
+  vm.runInNewContext(source, { module, require: name => name === 'electron' ? { app } : name === 'electron-updater' ? { autoUpdater: updater } : require(name), process: { platform: 'win32' }, Date, Error, String, Math, JSON });
+  const manager = new module.exports.UpdateManager(() => {});
+  assert.equal(updater.autoDownload, false);
+  assert.equal(updater.autoInstallOnAppQuit, false);
+  await manager.check();
+  assert.equal(checks, 1);
+  assert.equal(downloads, 0);
+  assert.equal(installs, 0);
+  assert.equal(manager.snapshot().availableVersion, '2.0.0');
+  await manager.download();
+  assert.equal(downloads, 1);
+  assert.equal(installs, 0);
+  manager.install();
+  assert.equal(installs, 1);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
